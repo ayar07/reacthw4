@@ -1,23 +1,40 @@
-import logo from './logo.svg';
-import './App.css';
+
+import "./App.css";
+import Input from "./components/Input";
+import { useEffect, useState } from "react";
+import TodoList from "./components/TodoList";
 
 function App() {
+  const [list, setList] = useState([]);
+
+  useEffect(()=>{
+    localStorage.setItem("todoList", JSON.stringify(list))
+  },[list])
+  
+
+  const addTodo = (todo) => {
+    const newList = [...list, { ...todo, id: Date.now() }];
+    setList(newList);
+  };
+
+  const deleteTodo = (id) => {
+    const newList = list.filter((item) => item.id !== id);
+    setList(newList);
+  };
+
+  const editTodo = (todo, id) => {
+    const idx = list.findIndex((el) => el.id === id);
+    const before = list.slice(0, idx);
+    const item = list[idx];
+    const after = list.slice(idx + 1);
+    const newList = [...before, { ...item, title: todo }, ...after];
+    setList(newList);
+  };
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Input addTodo={addTodo} />
+      <TodoList list={list} deleteTodo={deleteTodo} editTodo={editTodo} />
     </div>
   );
 }
